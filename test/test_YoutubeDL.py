@@ -756,7 +756,9 @@ class TestYoutubeDL(unittest.TestCase):
                     self.assertEqual(got, expect, f'Wrong {name} from {tmpl}')
 
         if os.name == 'nt':
-            test('a' * 32800, 'a' * 32800)
+            from pathlib import Path
+            p = str(Path('a' * 32800).resolve())
+            test(p, p)
 
         # Side-effects
         original_infodict = dict(self.outtmpl_info)
