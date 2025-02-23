@@ -755,6 +755,9 @@ class TestYoutubeDL(unittest.TestCase):
                 elif expect is not None:
                     self.assertEqual(got, expect, f'Wrong {name} from {tmpl}')
 
+        if os.name == 'nt':
+            test('a' * 32800, 'a' * 32800)
+
         # Side-effects
         original_infodict = dict(self.outtmpl_info)
         test('foo.bar', 'foo.bar')
