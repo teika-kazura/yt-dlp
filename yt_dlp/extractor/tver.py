@@ -1,6 +1,9 @@
+import datetime
+
 from .common import InfoExtractor
 from ..utils import (
     ExtractorError,
+    int_or_none,
     join_nonempty,
     smuggle_url,
     str_or_none,
@@ -144,6 +147,25 @@ class TVerIE(InfoExtractor):
         provider = str_or_none(episode_content.get('productionProviderName'))
         onair_label = str_or_none(episode_content.get('broadcastDateLabel'))
 
+        broadcast_date = str_or_none(episode_content.get('broadcastDateLabel'))
+
+        if broadcast_date:
+            # strip meaningless suffixes
+            # 放送分 means "portion broadscast on <date>"
+            if broadcast_date[-3:] == '放送分':
+                broadcast_date = broadcast_date[:-3]
+            # 放送 means "was broadcast on/in"
+            elif broadcast_date[-2:] == '放送':
+                broadcast_date = broadcast_date[:-2]
+        else:
+            broadcast_date = ''
+
+        closure_date_ts = int_or_none(episode_content.get('endAt'))
+        if closure_date_ts:
+            streaming_closure_date = datetime.datetime.fromtimestamp(closure_date_ts).astimezone(datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo).strftime('%Y-%m-%d %H:%M:%S %Z')
+        else:
+            streaming_closure_date = ''
+
         thumbnails = [
             {
                 'id': quality,
@@ -174,4 +196,6 @@ class TVerIE(InfoExtractor):
             'url': smuggle_url(
                 self.BRIGHTCOVE_URL_TEMPLATE % (p_id, r_id), {'geo_countries': ['JP']}),
             'ie_key': 'BrightcoveNew',
+            'streaming_closure_date': streaming_closure_date,
+            'broadcast_date': broadcast_date,
         }
