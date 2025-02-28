@@ -1485,10 +1485,9 @@ Without this, download would fail only after the entire file is downloaded."""
         with tempfile.TemporaryDirectory() as d:
             os.chdir(d)
             try:
-                with open(filename, 'w') as f:
-                    f.close()
+                open(filename, 'w').close()
             except OSError as e:
-                if (os.name == 'nt' and e.errno == 206) or (e.errno == errno.ENAMETOOLONG):
+                if (os.name == 'nt' and e.errno == 206) or (os.name != 'nt' and e.errno == errno.ENAMETOOLONG):
                     # The first condition is for windows,
                     # and the second for unix-ish systems.
 
@@ -1498,6 +1497,12 @@ Without this, download would fail only after the entire file is downloaded."""
                     # but respect the directory from --output of the original call.
                     self.to_screen('''[Notice] The file name to be saved is too long, exceeding the OS limit.
 [Notice] Consider options --trim-filenames or -o (--output).''')
+
+                    raise
+
+                elif os.name == 'nt' and e.errno == 22:
+                    self.to_screen(f'''[Notice] Attempt to create file {filename} resulted in Errno 22.
+This is often caused e.g. by too long filename or forbidden characters.''')
 
                     raise
             finally:
