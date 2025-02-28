@@ -737,6 +737,10 @@ class TestYoutubeDL(unittest.TestCase):
         ],
     }
 
+    def test_long_filename(self):
+        ydl = FakeYDL()
+        ydl.validate_destination_filename('a' * 1024)
+
     def test_prepare_outtmpl_and_filename(self):
         def test(tmpl, expected, *, info=None, **params):
             params['outtmpl'] = tmpl
