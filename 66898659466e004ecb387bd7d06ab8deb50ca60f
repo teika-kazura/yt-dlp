@@ -1,0 +1,7 @@
+YoutubeDL.py: Defines a new function validate_destination_filename(), which checks the filename length limit before downloading.
+
+test_YoutubeDL.py: Modified test_prepare_outtmpl_and_filename(), to prevent bogus error. Without it, some tests fail due to too long filename. But its test purpose is to verify template, not the filename length.
+
+This closes issue #8908 """yt-dlp should abort on first "File name too long" error"""
+
+Previously for some extractors too long filename resulted in failure only after the entire file is downloaded. This PR #12450 solves this issue, working for any extractor.
