@@ -737,6 +737,22 @@ class TestYoutubeDL(unittest.TestCase):
         ],
     }
 
+    def test_long_filename1(self):
+        ydl = FakeYDL()
+        ydl.validate_destination_filename(os.sep + 'aa' + os.sep + 'bbbb' + os.sep + 'a' * 1024)
+
+    def test_long_filename2(self):
+        ydl = FakeYDL()
+        dotdot = '..' + os.sep
+        ydl.validate_destination_filename(dotdot * 4 + 'aaaaa' + os.sep + dotdot * 4 + 'b' * 1024)
+
+    def test_long_filename3(self):
+        if os.name != 'nt':
+            return
+        ydl = FakeYDL()
+        path = os.path.join('C:', '..', '..', 'a' * 1024)
+        ydl.validate_destination_filename(path)
+
     def test_prepare_outtmpl_and_filename(self):
         def test(tmpl, expected, *, info=None, **params):
             params['outtmpl'] = tmpl
